@@ -36,7 +36,7 @@ def get_catalog_keyboard():
 # ==================== КОМАНДЫ ====================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        f"🎮 Добро пожаловать в PUBG Mobile UC Shop!\nВыберите действие:",
+        f"🎮 Добро пожаловать в PUBG Mobile UC Shop!\n\nВыберите действие:",
         reply_markup=get_main_keyboard()
     )
 
@@ -47,18 +47,23 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if data == "catalog":
         await query.edit_message_text("📋 Выбери товар:", reply_markup=get_catalog_keyboard())
+    
     elif data == "support":
         kb = [[InlineKeyboardButton("✏️ Написать админу", url=f"https://t.me/{ADMIN_USERNAME[1:]}")],
               [InlineKeyboardButton("◀️ Назад", callback_data="back_to_main")]]
         await query.edit_message_text(f"👨‍💻 Поддержка: {ADMIN_USERNAME}", reply_markup=InlineKeyboardMarkup(kb))
+    
     elif data == "back_to_main":
         await query.edit_message_text("🎮 Главное меню:", reply_markup=get_main_keyboard())
+    
     elif data.startswith("buy_"):
         uc = int(data.split("_")[1])
         price = next((p for u, p in PRODUCTS if u == uc), None)
         if price:
-            text = (f"✅ {uc} UC - {price}₽\n\n💳 Карта: {CARD_NUMBER}\n📱 СБП: {PHONE_NUMBER}\n\n"
-                    f"📌 После оплаты напиши {ADMIN_USERNAME} и пришли скриншот!")
+            text = (f"✅ {uc} UC - {price}₽\n\n"
+                    f"💳 Карта: {CARD_NUMBER}\n"
+                    f"📱 СБП: {PHONE_NUMBER}\n\n"
+                    f"📌 После оплаты напиши {ADMIN_USERNAME} с скриншотом чека!")
             kb = [[InlineKeyboardButton("📩 Написать админу", url=f"https://t.me/{ADMIN_USERNAME[1:]}")],
                   [InlineKeyboardButton("◀️ Назад", callback_data="catalog")]]
             await query.edit_message_text(text, reply_markup=InlineKeyboardMarkup(kb))
@@ -68,7 +73,8 @@ def main():
     app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_handler))
-    print("🚀 БОТ ЗАПУЩЕН НА RENDER!")
+    print("🚀 БОТ ЗАПУЩЕН!")
+    print("📱 @deyzich_shop0_bot")
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":
