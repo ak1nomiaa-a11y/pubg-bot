@@ -1,10 +1,10 @@
 import logging
+import asyncio
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
 # ==================== НАСТРОЙКИ ====================
 TOKEN = "8219793147:AAEyRYKOXXAmHpiAj3RK7tWM-CFYkDTbITM"
-ADMIN_ID = 8679498618
 ADMIN_USERNAME = "@zvqni"
 WEBAPP_URL = "https://ak1nomiaa-a11y.github.io/uc-shopp/"
 
@@ -130,8 +130,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                   [InlineKeyboardButton("◀️ Назад", callback_data="catalog")]]
             await query.edit_message_text(text, reply_markup=InlineKeyboardMarkup(kb), parse_mode="Markdown")
 
-# ==================== ЗАПУСК ====================
-def main():
+# ==================== ЗАПУСК (ФИКС ДЛЯ RENDER) ====================
+async def main():
     app = Application.builder().token(TOKEN).build()
     
     app.add_handler(CommandHandler("start", start))
@@ -140,11 +140,17 @@ def main():
     app.add_handler(CommandHandler("support", support_command))
     app.add_handler(CallbackQueryHandler(button_handler))
     
-    print("🚀 БОТ ЗАПУЩЕН!")
+    print("🚀 БОТ ЗАПУЩЕН НА RENDER!")
     print("📱 @deyzich_shop0_bot")
-    print("⚡ Нажми Ctrl+C для остановки\n")
+    print("⚡ Работает 24/7\n")
     
-    app.run_polling(allowed_updates=Update.ALL_TYPES)
+    await app.initialize()
+    await app.start()
+    await app.updater.start_polling()
+    
+    # Бесконечное ожидание
+    while True:
+        await asyncio.sleep(1)
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
